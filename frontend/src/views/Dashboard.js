@@ -1,9 +1,20 @@
 import {useState, useEffect} from 'react'
 import useAxios from "../utils/useAxios"
 import jwtDecode from 'jwt-decode'
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+
 function Dashboard() {
 
-    const [res, setRes] = useState("")
+  const [res, setRes] = useState('');
+  const [events, setEvents] = useState([]); // State to hold calendar events
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    start: new Date(),
+    end: new Date(),
+  });
+
     const api = useAxios();
     const token = localStorage.getItem("authTokens")
 
@@ -43,7 +54,38 @@ function Dashboard() {
       fetchPostData()
     }, [])
 
+    const localizer = momentLocalizer(moment);
 
+   
+  const handleNewEventChange = (e) =>{
+    const {name, value} = e.target;
+  setNewEvent((prevEvent) =>( {
+    ...prevEvent,
+    [name]: name === 'start' || name === 'end' ? new Date(value) : value,
+  }));
+};
+const handleAddEvent = () => {
+  setEvents((prevEvents) => [...prevEvents, newEvent]);
+  setNewEvent({
+    title: '',
+    start: new Date(),
+    end: new Date(),
+  });
+};
+
+const eventStyleGetter = (event, start, end, isSelected) => {
+  const style = {
+    backgroundColor: event.color || '#3174ad',
+    borderRadius: '5px',
+    opacity: 0.8,
+    color: 'white',
+    border: '0px',
+    display: 'block',
+  };
+  return {
+    style,
+  };
+};
   return (
     <div>
       <>
@@ -61,36 +103,36 @@ function Dashboard() {
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="file" />
-                Orders
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="shopping-cart" />
-                Products
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="users" />
-                Customers
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="bar-chart-2" />
-                Reports
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="layers" />
-                Integrations
+                
               </a>
             </li>
           </ul>
           <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <span>Saved reports</span>
+            <span></span>
             <a className="d-flex align-items-center text-muted" href="#">
               <span data-feather="plus-circle" />
             </a>
@@ -99,25 +141,25 @@ function Dashboard() {
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="file-text" />
-                Current month
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="file-text" />
-                Last quarter
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="file-text" />
-                Social engagement
+                
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">
                 <span data-feather="file-text" />
-                Year-end sale
+                
               </a>
             </li>
           </ul>
@@ -128,34 +170,59 @@ function Dashboard() {
           <h1 className="h2">My Dashboard</h1>
           <span>Hello {username}!</span>
           <div className="btn-toolbar mb-2 mb-md-0">
-            <div className="btn-group mr-2">
-              <button className="btn btn-sm btn-outline-secondary">
-                Share
-              </button>
-              <button className="btn btn-sm btn-outline-secondary">
-                Export
-              </button>
-            </div>
-            <button className="btn btn-sm btn-outline-secondary dropdown-toggle">
-              <span data-feather="calendar" />
-              This week
-            </button>
+                        
           </div>
         </div>
         <div className='alert alert-success'>
           <strong>{res}</strong>
         </div>
-        <h2>Section title</h2>
+        <h2>Calendar</h2>
         <div className="table-responsive">
-          <table className="table table-striped table-sm">
-            
-              
-            
-            <tbody>
-         
-            </tbody>
-          </table>
+        <Calendar 
+        localizer={localizer} 
+        events={events} 
+        startAccessor="start" 
+        endAccessor="end" 
+        views={['month', 'week', 'day', 'agenda' ]} dayPropGetter={(date) => {
+          const dayEvents = events.filter(
+            (event) =>
+              moment(date).startOf('day').isSameOrBefore(moment(event.end)) &&
+              moment(date).endOf('day').isSameOrAfter(moment(event.start))
+          );
+
+          return {
+            className: dayEvents.length > 0 ? 'has-events' : '',
+          };
+        }}
+        components={{
+          event: (event) => (
+            <span>
+              <strong>{event.title}</strong>
+            </span>
+          ),
+        }}
+        eventPropGetter={eventStyleGetter}
+        />
         </div>
+        <div>
+          <h3>Add New Event</h3>
+          <div className="form-group">
+                  <label>Title:</label>
+                  <input type="text" name="title" value={newEvent.title} onChange={handleNewEventChange} />
+                </div>
+                <div className="form-group">
+                  <label>Start Date:</label>
+                  <input type="datetime-local" name="start" value={moment(newEvent.start).format('YYYY-MM-DDTHH:mm')} onChange={handleNewEventChange} />
+                </div>
+                <div className="form-group">
+                  <label>End Date:</label>
+                  <input type="datetime-local" name="end" value={moment(newEvent.end).format('YYYY-MM-DDTHH:mm')} onChange={handleNewEventChange} />
+                </div>
+                <button type="button" onClick={handleAddEvent}>Add Event</button>
+                </div>
+            
+
+        
       </main>
     </div>
   </div>

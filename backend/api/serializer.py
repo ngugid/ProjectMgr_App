@@ -16,7 +16,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         
-        # These are claims, you can add custom claims
+        # These are claims
         token['full_name'] = user.profile.full_name
         token['username'] = user.username
         token['email'] = user.email
@@ -60,7 +60,7 @@ class TodoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Todo
-        fields = ['id', 'user', 'title', 'completed']
+        fields = ['id', 'user', 'title', 'completed', 'duration']
 
 
     

@@ -57,7 +57,7 @@ class TodoListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_id = self.kwargs['user_id']
         user = User.objects.get(id=user_id)
-
+        todo_duration = self.kwargs['todo_duration']
         todo = Todo.objects.filter(user=user) 
         return todo
     
@@ -68,6 +68,7 @@ class TodoDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         user_id = self.kwargs['user_id']
         todo_id = self.kwargs['todo_id']
+        todo_duration = self.kwargs['todo_duration']
 
         user = User.objects.get(id=user_id)
         todo = Todo.objects.get(id=todo_id, user=user)

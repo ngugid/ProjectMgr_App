@@ -16,7 +16,7 @@ function Loginpage() {
 
     console.log(email)
     console.log(password)
-   
+
   }
 
   return (

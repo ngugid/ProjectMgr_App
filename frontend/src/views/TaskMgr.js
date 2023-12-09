@@ -8,7 +8,7 @@ function Task() {
     const baseUrl = "http://127.0.0.1:8000/api"
     const api = useAxios()
 
-    const token = localStorage.getItem("authTokens") // 233704237huhweioyop;yrwriweyrwe
+    const token = localStorage.getItem("authTokens") 
     const decoded = jwtDecode(token)
     const user_id = decoded.user_id
 
@@ -25,7 +25,7 @@ function Task() {
     }
 
     
-    const [createTask, setCreateTask] = useState({title: "", completed: ""})
+    const [createTask, setCreateTask] = useState({title: "", completed: "", duration: 0 })
     const handleNewTaskTitle = (event) => {
         setCreateTask({
             ...createTask,
@@ -41,6 +41,7 @@ function Task() {
         formdata.append("user", user_id)
         formdata.append("title", createTask.title)
         formdata.append("completed", false)
+        formdata.append("duration", createTask.duration)
 
         try{
             api.post(baseUrl + '/Task/' + user_id + '/', formdata).then((res) => {
@@ -113,7 +114,7 @@ function Task() {
                                             <p className="form-control"><strike>{Task.title}</strike></p>
                                         }
                                         {Task.completed.toString() === "false" && 
-                                            <p className="form-control">{Task.title}</p>
+                                            <p className="form-control">{Task.title} - duration: {Task.duration} days</p>
                                         }
                                         <div className="input-group-append">
                                             <button className="btn bg-success text-white ml-2" type="button" id="button-addon2 " onClick={() => markTaskAsComplete(Task.id)}><i className='fas fa-check' ></i></button>
